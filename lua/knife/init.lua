@@ -1,3 +1,3 @@
 return {
-    require('knife.docs').generate_xmldoc_under_cursor
+    generate_xmldoc_under_cursor = require('knife.docs').generate_xmldoc_under_cursor
 }
