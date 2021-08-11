@@ -33,7 +33,7 @@ To use map `requre('knife').generate_xml_doc_under_cursor()` function to the key
 your choice.
 
 # Roadmap
-[x] Context XML documentation generator.
-[ ] Smart entity renaming with file.
-[ ] New class/interface/enum in separate file creation.
-[ ] Smart replacing XML documentation comments on new generation.
+- [x] Context XML documentation generator.
+- [ ] Smart entity renaming with file.
+- [ ] New class/interface/enum in separate file creation.
+- [ ] Smart replacing XML documentation comments on new generation.
