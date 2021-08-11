@@ -3,17 +3,11 @@
 A Neovim plugin with useful tools for C# development.
 
 # Installation
-## Dependencies
-
-```
-nvim-treesitter
-```
-
 ## vim-plug
 
 Add to the startup config file:
 ```
-Plug '
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'cranberry-knight/knife.nvim'
 ```
 
@@ -29,7 +23,7 @@ One can generate XML documentation for classes, methods fields, properties, etc.
 For methods information about parameters, return type and possible exceptions
 are used.
 
-To use map `requre('knife').generate_xml_doc_under_cursor()` function to the key of
+To use map `require('knife').generate_xml_doc_under_cursor()` function to the key of
 your choice.
 
 # Roadmap
