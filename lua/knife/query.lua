@@ -37,18 +37,33 @@ end
 -- @param node tsnode or nil: A tree-sitter node where search is performed.
 -- @returns QueryResult: A table with matches.
 local function match(language, buffer, query, node)
+    local function not_present(matches, capture, range, value)
+        for _, c in ipairs(matches[capture] or {}) do
+            if c.range == range and c.value == value then
+                return false;
+            end
+        end
+        return true;
+    end
+
     local root = node or ts.get_parser(buffer, language):parse()[1]:root()
 
     local matches = {}
     local from, _, to, _ = root:range()
     for id, n, _ in query:iter_captures(root, buffer, from, to) do
         local capture = query.captures[id]
-        table_extra.grow_sublist(matches, capture, {
-            type = n:type(),
-            range = Range.from_node(n),
-            value = tsq.get_node_text(n, buffer),
-            node = n
-        })
+
+        range = Range.from_node(n)
+        value = tsq.get_node_text(n, buffer)
+
+        if not_present(matches, capture, range, value) then
+            table_extra.grow_sublist(matches, capture, {
+                type = n:type(),
+                range = range,
+                value = value,
+                node = n
+            })
+        end
     end
     return QueryResult.new(buffer, matches)
 end

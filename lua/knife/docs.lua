@@ -36,13 +36,17 @@ local scope_query = ts.parse_query(language, [[
 
 local method_details_query = ts.parse_query(language, [[
 (method_declaration
-	type: (predefined_type) @return_type
+	type: (_) @return_type
+    type_parameters: (type_parameter_list
+    	(type_parameter 
+        	(identifier) @generic_types
+        )
+    )?
     parameters: (parameter_list
 		(parameter
         	name: (identifier) @parameter_names
-        )
+        )?
     )
-    	
 )
 (throw_statement (
     object_creation_expression
@@ -51,33 +55,45 @@ local method_details_query = ts.parse_query(language, [[
 )?
 ]])
 
-local function create_default_xmldoc()
-    return {
-        '/// <summary>',
-        '/// ',
-        '/// </summary>',
-    }
+local function insert_tag(doc, name, parameters)
+    parameters_str = ''
+    for k, v in pairs(parameters or {}) do
+        parameters_str = parameters_str..string.format(' %s="%s"', k, v)
+    end
+
+    table.insert(doc, string.format('/// <%s%s>', name, parameters_str))
+    table.insert(doc, '/// ')
+    table.insert(doc, string.format('/// </%s>', name))
 end
 
-local function create_xmldoc_for_method(parameter_names, return_type, exceptions)
+local function create_default_xmldoc()
+    doc = {}
+    insert_tag(doc, "summary")
+    return doc
+end
+
+local function create_xmldoc_for_method(
+    parameter_names,
+    return_type,
+    generic_types,
+    exception_types)
+
     local doc = create_default_xmldoc()
 
-    for _, name in ipairs(parameter_names) do
-        table.insert(doc, string.format('/// <param name="%s">', name))
-        table.insert(doc, string.format('/// '))
-        table.insert(doc, string.format('/// </param>'))
+    for _, type in ipairs(parameter_names) do
+        insert_tag(doc, 'param', { name = type })
     end
 
     if (return_type ~= 'void' and return_type ~= 'Task') then
-        table.insert(doc, string.format('/// <returns>'))
-        table.insert(doc, string.format('/// '))
-        table.insert(doc, string.format('/// </returns>'))
+        insert_tag(doc, 'returns')
     end
 
-    for _, type in ipairs(exceptions) do
-        table.insert(doc, string.format('/// <exception cref="%s">', type))
-        table.insert(doc, string.format('/// '))
-        table.insert(doc, string.format('/// </exception>'))
+    for _, type in ipairs(generic_types) do
+        insert_tag(doc, 'typeparam', { name = type })
+    end
+
+    for _, type in ipairs(exception_types) do
+        insert_tag(doc, 'exception', {cref = type})
     end
 
     return doc
@@ -119,19 +135,21 @@ function M.generate_xmldoc_under_cursor(buffer)
         declaration_range.from.column)
 
     if declaration_type == 'method_declaration' then
+        local unpack_capture = function(query_result, capture_name)
+            local unpacked = {}
+            for _, entry in ipairs(query_result.matches[capture_name] or {}) do
+                table.insert(unpacked, entry.value)
+            end
+            return unpacked
+        end
+
         details = query.match(language, buffer, method_details_query, declaration)
         return_type = details.matches.return_type or ''
-        parameter_names = {}
-        exceptions = {}
+        parameter_names = unpack_capture(details, 'parameter_names')
+        generic_types = unpack_capture(details, 'generic_types')
+        exception_types = unpack_capture(details, 'exception_types')
 
-        for _, argument in ipairs(details.matches.parameter_names or {}) do
-            table.insert(parameter_names, argument.value)
-        end
-        for _, exception in ipairs(details.matches.exception_types or {}) do
-            table.insert(exceptions, exception.value)
-        end
-
-        doc = create_xmldoc_for_method(parameter_names, return_type, exceptions)
+        doc = create_xmldoc_for_method(parameter_names, return_type, generic_types, exception_types)
     else
         if vim.endswith(declaration_type, '_declaration') then
             doc = create_default_xmldoc()

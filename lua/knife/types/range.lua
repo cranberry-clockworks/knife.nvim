@@ -3,7 +3,12 @@
 -- @field from Postion: a start of the range.
 -- @field to Position: a end of the range.
 local Range = {}
-local RangeImpl = {__index = Range}
+local RangeImpl = {
+    __index = Range,
+    __eq = function(r1, r2)
+        return r1.from == r2.from and r1.to == r2.to
+    end
+}
 
 --- Creates a new range that represent piece of buffer.
 --- Keep in mind that range is not a rectangle but sequence of characters.

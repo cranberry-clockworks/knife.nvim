@@ -3,7 +3,12 @@
 -- @field row number: A row number starting from 0.
 -- @field column number: A column number starting from 0.
 local Position = {}
-local PositionImpl = {__index = Position}
+local PositionImpl = {
+    __index = Position,
+    __eq = function(p1, p2)
+        return p1.row == p2.row and p1.column == p2.column
+    end
+}
 
 function Position.new(ts_row, ts_column)
     return setmetatable({
