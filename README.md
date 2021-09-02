@@ -28,6 +28,8 @@ your choice.
 
 # Roadmap
 - [x] Context XML documentation generator.
+  - [x] XML documentation for generic methods.
+  - [ ] XML documentation for generic structs, classes and interfaces.
 - [ ] Smart entity renaming with file.
 - [ ] New class/interface/enum in separate file creation.
 - [ ] Smart replacing XML documentation comments on new generation.
