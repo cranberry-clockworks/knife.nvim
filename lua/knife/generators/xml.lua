@@ -7,7 +7,7 @@
 -- @param format string: A format of the generated tag as follows:
 --      "sparse":
 --          <sample a="a" b="b">
---          
+--
 --          </sample>
 --      "compact":
 --          <sample a="a" b="b">
@@ -18,7 +18,7 @@ function M.write_tag(to, name, parameters, format)
     format = format or 'sparse'
 
     params_str = ''
-    for k, v in pairs(parameters or {}) do 
+    for k, v in pairs(parameters or {}) do
         params_str = params_str .. string.format(' %s="%s"', k, v)
     end
 
@@ -28,7 +28,7 @@ function M.write_tag(to, name, parameters, format)
         table.insert(to, string.format('</%s>', name))
         return
     end
-    
+
     if format == 'compact' then
         table.insert(to, string.format('<%s%s>', name, params_str))
         table.insert(to, string.format('</%s>', name))
@@ -42,7 +42,7 @@ function M.write_tag(to, name, parameters, format)
 
     error(
         string.format(
-            'Unknown format: %s. Use one of the follows: "sparse", "compact", "minimal"', 
+            'Unknown format: %s. Use one of the following: "sparse", "compact", "minimal"',
             format
         )
     )
