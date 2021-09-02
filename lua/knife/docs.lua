@@ -3,6 +3,7 @@
 local Range = require('knife.types.range')
 local query = require('knife.query')
 local text = require('knife.text')
+local xml = require('knife.generators.xml')
 local ts = require('vim.treesitter')
 
 local language = 'c_sharp'
@@ -55,20 +56,9 @@ local method_details_query = ts.parse_query(language, [[
 )?
 ]])
 
-local function insert_tag(doc, name, parameters)
-    parameters_str = ''
-    for k, v in pairs(parameters or {}) do
-        parameters_str = parameters_str..string.format(' %s="%s"', k, v)
-    end
-
-    table.insert(doc, string.format('/// <%s%s>', name, parameters_str))
-    table.insert(doc, '/// ')
-    table.insert(doc, string.format('/// </%s>', name))
-end
-
 local function create_default_xmldoc()
     doc = {}
-    insert_tag(doc, "summary")
+    xml.write_tag(doc, "summary")
     return doc
 end
 
@@ -81,19 +71,19 @@ local function create_xmldoc_for_method(
     local doc = create_default_xmldoc()
 
     for _, type in ipairs(parameter_names) do
-        insert_tag(doc, 'param', { name = type })
+        xml.write_tag(doc, 'param', { name = type })
     end
 
     if (return_type ~= 'void' and return_type ~= 'Task') then
-        insert_tag(doc, 'returns')
+        xml.write_tag(doc, 'returns')
     end
 
     for _, type in ipairs(generic_types) do
-        insert_tag(doc, 'typeparam', { name = type })
+        xml.write_tag(doc, 'typeparam', { name = type })
     end
 
     for _, type in ipairs(exception_types) do
-        insert_tag(doc, 'exception', {cref = type})
+        xml.write_tag(doc, 'exception', {cref = type})
     end
 
     return doc
@@ -158,7 +148,7 @@ function M.generate_xmldoc_under_cursor(buffer)
         end
     end
 
-    text.indent_with_prefix(doc, indent)
+    text.prefix_with(doc, indent .. '/// ')
 
     -- Tree sitter indexing format is (0, 0) while vim is (1, 0)
     -- Therefore row before in vim would be just row in the TS.

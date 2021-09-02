@@ -1,6 +1,9 @@
 local M = {}
 
-function M.indent_with_prefix(lines, prefix)
+--- Prepends given string to the each line in the table.
+-- @param lines table: A table of the strings. Each item represents line of the document.
+-- @param prefix string: A string that prepended to each item in the table.
+function M.prefix_with(lines, prefix)
     for i, line in ipairs(lines) do
         lines[i] = prefix .. line
     end
