@@ -10,47 +10,67 @@ local language = 'c_sharp'
 
 local scope_query = ts.parse_query(language, [[
 [
-	(class_declaration
-		name: (_) @name
-  	)
-    (record_declaration
+    (
+        class_declaration
         name: (_) @name
     )
-    (enum_declaration
+    (
+        struct_declaration
         name: (_) @name
     )
-    (field_declaration
-        (variable_declaration
-            (variable_declarator
+    (
+        record_declaration
+        name: (_) @name
+    )
+    (
+        enum_declaration
+        name: (_) @name
+    )
+    (
+        field_declaration
+        (
+            variable_declaration
+            (
+                variable_declarator
                 (identifier) @name
             )
         )
     )
-    (property_declaration
+    (
+        property_declaration
         name: (_) @name
     )
-  	(method_declaration
-		name: (_) @name
-  	)
+    (
+        method_declaration
+        name: (_) @name
+    )
 ]
 ]])
 
 local method_details_query = ts.parse_query(language, [[
-(method_declaration
-	type: (_) @return_type
-    type_parameters: (type_parameter_list
-    	(type_parameter 
-        	(identifier) @generic_types
+(
+    method_declaration
+    type: (_) @return_type
+    type_parameters:
+    (
+        type_parameter_list
+        (
+            type_parameter 
+            (identifier) @generic_types
         )
     )?
-    parameters: (parameter_list
-		(parameter
-        	name: (identifier) @parameter_names
+    parameters: (
+        parameter_list
+        (
+            parameter
+            name: (identifier) @parameter_names
         )?
     )
 )
-(throw_statement (
-    object_creation_expression
+(
+    throw_statement
+    (
+        object_creation_expression
         type: (identifier) @exception_types
     )
 )?
@@ -114,7 +134,6 @@ function M.generate_xmldoc_under_cursor(buffer)
     end
 
     assert(scope.matches.name ~= nil, 'Something wrong with the query')
-
 
     local declaration = traverse_to_declaration_node(scope.matches.name[1].node)
     local declaration_type = declaration:type()
