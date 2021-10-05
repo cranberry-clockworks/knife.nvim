@@ -1,6 +1,6 @@
-local table_extra = require('knife.types.table_extra')
-local Position = require('knife.types.position')
-local Range = require('knife.types.range')
+local table_extra = require('knife.lib.types.table_extra')
+local Position = require('knife.lib.types.position')
+local Range = require('knife.lib.types.range')
 
 local ts = require('vim.treesitter')
 local tsq = require('vim.treesitter.query')

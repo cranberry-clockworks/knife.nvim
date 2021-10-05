@@ -1,9 +1,9 @@
 -- require("plenary.reload").reload_module("knife")
 
-local Range = require('knife.types.range')
-local query = require('knife.query')
-local text = require('knife.text')
-local xml = require('knife.generators.xml')
+local Range = require('knife.lib.types.range')
+local query = require('knife.lib.query')
+local text = require('knife.lib.text')
+local xml = require('knife.lib.generators.xml')
 local ts = require('vim.treesitter')
 
 local language = 'c_sharp'
